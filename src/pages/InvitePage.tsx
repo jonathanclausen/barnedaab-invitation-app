@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { openInvite, recordLinkVisit, submitRsvp } from '../api'
+import { ApiError, openInvite, recordLinkVisit, submitRsvp } from '../api'
 import { formatDate, formatShortDate, joinNames } from '../format'
 import type { Answer, EventSettings, GuestInvite } from '../types'
 import { Ornament } from '../components/Ornament'
@@ -63,8 +63,13 @@ export default function InvitePage() {
       }
       setEvent(found.event)
       setInvite(found.invite)
-    } catch {
-      if (!silent) setError('Noget gik galt. Tjek din internetforbindelse og prøv igen.')
+    } catch (e) {
+      if (!silent)
+        setError(
+          e instanceof ApiError && e.status === 429
+            ? 'For mange forkerte forsøg. Vent et kvarter, og prøv igen.'
+            : 'Noget gik galt. Tjek din internetforbindelse og prøv igen.',
+        )
     } finally {
       setChecking(false)
     }
@@ -168,8 +173,12 @@ function Invitation({
       setInvite(await submitRsvp(invite.id, code, answers, note.trim()))
       setEditing(false)
       setJustSent(true)
-    } catch {
-      setError('Svaret kunne ikke gemmes. Prøv igen om lidt.')
+    } catch (e) {
+      setError(
+        e instanceof ApiError && e.status === 429
+          ? 'Der er sendt mange svar på kort tid. Prøv igen om lidt.'
+          : 'Svaret kunne ikke gemmes. Prøv igen om lidt.',
+      )
     } finally {
       setSaving(false)
     }

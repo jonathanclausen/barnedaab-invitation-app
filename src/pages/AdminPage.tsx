@@ -50,7 +50,9 @@ function Login({ onLogin }: { onLogin: () => void }) {
       setError(
         err instanceof ApiError && err.code === 'no-password-configured'
           ? 'Der er ikke sat et admin-kodeord (ADMIN_PASSWORD) i Cloudflare endnu.'
-          : 'Forkert kodeord.',
+          : err instanceof ApiError && err.status === 429
+            ? 'For mange forkerte forsøg. Vent et kvarter, og prøv igen.'
+            : 'Forkert kodeord.',
       )
     } finally {
       setBusy(false)

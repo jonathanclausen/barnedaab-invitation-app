@@ -163,3 +163,41 @@ export function logEvent(env: Env, request: Request, inviteId: string, type: Eve
     .bind(inviteId, type, at, deviceOf(request), JSON.stringify(data))
     .run()
 }
+
+// ---------- Begrænsning af forsøg ----------
+
+export const clientIp = (request: Request) => request.headers.get('cf-connecting-ip') ?? 'ukendt'
+
+export interface Limit {
+  key: string
+  max: number
+  windowMinutes: number
+}
+
+/** Sand hvis en af grænserne er nået i det nuværende vindue */
+export async function isLimited(env: Env, limits: Limit[]) {
+  const rows = await env.DB.batch(
+    limits.map((l) => env.DB.prepare('SELECT count, reset_at FROM attempts WHERE key = ?').bind(l.key)),
+  )
+  return rows.some((r, i) => {
+    const row = r.results[0] as { count: number; reset_at: number } | undefined
+    return !!row && row.reset_at > Date.now() && row.count >= limits[i].max
+  })
+}
+
+/** Registrér et forsøg (forkert kode, forkert kodeord, svar) mod hver grænse */
+export async function countAttempt(env: Env, limits: Limit[]) {
+  const t = Date.now()
+  await env.DB.batch(
+    limits.map((l) =>
+      env.DB.prepare(
+        `INSERT INTO attempts (key, count, reset_at) VALUES (?1, 1, ?2)
+         ON CONFLICT(key) DO UPDATE SET
+           count = CASE WHEN reset_at <= ?3 THEN 1 ELSE count + 1 END,
+           reset_at = CASE WHEN reset_at <= ?3 THEN ?2 ELSE reset_at END`,
+      ).bind(l.key, t + l.windowMinutes * 60_000, t),
+    ),
+  )
+  // Ryd gamle rækker op en gang imellem
+  if (Math.random() < 0.05) await env.DB.prepare('DELETE FROM attempts WHERE reset_at <= ?').bind(t).run()
+}

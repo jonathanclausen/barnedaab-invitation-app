@@ -1,5 +1,9 @@
 import {
   checkPassword,
+  clientIp,
+  countAttempt,
+  isLimited,
+  type Limit,
   cleanGuests,
   clearCookie,
   findInvite,
@@ -20,6 +24,27 @@ import {
   type Env,
 } from './lib'
 
+// Forkerte koder: 10 pr. invitation og 30 pr. IP pr. kvarter. Et 4-cifret gæt tager så dage, ikke minutter.
+const codeLimits = (request: Request, id: string): Limit[] => [
+  { key: `code:${id}`, max: 10, windowMinutes: 15 },
+  { key: `code-ip:${clientIp(request)}`, max: 30, windowMinutes: 15 },
+]
+// Admin-login: 5 forkerte pr. IP og 30 i alt pr. kvarter
+const loginLimits = (request: Request): Limit[] => [
+  { key: `login-ip:${clientIp(request)}`, max: 5, windowMinutes: 15 },
+  { key: 'login-all', max: 30, windowMinutes: 15 },
+]
+const tooMany = () => json({ error: 'too-many-attempts' }, 429)
+
+/** Slår invitationen op og tæller forkerte koder */
+async function checkCode(request: Request, env: Env, id: string, code: unknown) {
+  const limits = codeLimits(request, id)
+  if (await isLimited(env, limits)) return 'limited' as const
+  const row = await findInvite(env, id, code)
+  if (!row) await countAttempt(env, limits)
+  return row
+}
+
 type Ctx = { request: Request; env: Env; params: Record<string, string> }
 type Handler = (ctx: Ctx) => Promise<Response>
 
@@ -39,7 +64,8 @@ const site: Handler = async ({ env }) => {
 /** Gæsten taster koden: returnerer invitationen og tæller en åbning */
 const openInvite: Handler = async ({ request, env, params }) => {
   const body = await readJson<{ code?: string; preview?: boolean }>(request)
-  const row = await findInvite(env, params.id, body.code)
+  const row = await checkCode(request, env, params.id, body.code)
+  if (row === 'limited') return tooMany()
   if (!row) return json({ error: 'wrong-code' }, 404)
 
   const preview = body.preview === true && (await isAdmin(request, env))
@@ -69,8 +95,13 @@ const visit: Handler = async ({ request, env, params }) => {
 
 const rsvp: Handler = async ({ request, env, params }) => {
   const body = await readJson<{ code?: string; rsvp?: Record<string, unknown>; note?: unknown }>(request)
-  const row = await findInvite(env, params.id, body.code)
+  const row = await checkCode(request, env, params.id, body.code)
+  if (row === 'limited') return tooMany()
   if (!row) return json({ error: 'wrong-code' }, 404)
+  // Højst 20 svar pr. invitation i timen, så ingen kan oversvømme historikken
+  const rsvpLimit = [{ key: `rsvp:${row.id}`, max: 20, windowMinutes: 60 }]
+  if (await isLimited(env, rsvpLimit)) return tooMany()
+  await countAttempt(env, rsvpLimit)
 
   const guestIds = (JSON.parse(row.guests) as { id: string }[]).map((g) => g.id)
   const answers: Record<string, Answer> = {}
@@ -97,8 +128,11 @@ const rsvp: Handler = async ({ request, env, params }) => {
 
 const login: Handler = async ({ request, env }) => {
   if (!env.ADMIN_PASSWORD) return json({ error: 'no-password-configured' }, 500)
+  const limits = loginLimits(request)
+  if (await isLimited(env, limits)) return tooMany()
   const { password } = await readJson<{ password?: string }>(request)
   if (!(await checkPassword(env, password))) {
+    await countAttempt(env, limits)
     await new Promise((r) => setTimeout(r, 800)) // gør gætteri langsomt
     return json({ error: 'wrong-password' }, 401)
   }
