@@ -32,6 +32,7 @@ export default function InvitePage() {
   const { inviteId = '' } = useParams()
   const [params] = useSearchParams()
   const preview = params.get('preview') === '1'
+  const theme = params.get('tema') === 'enhjoerning' ? 'unicorn' : 'space'
   const initialCode = params.get('code') ?? readStoredCode(inviteId)
   const site = useSite()
 
@@ -97,6 +98,7 @@ export default function InvitePage() {
         monogram={site.monogram}
         open={ready}
         onOpened={() => setOpened(true)}
+        theme={theme}
         letter={
           <>
             <p className="eyebrow">Du er inviteret</p>

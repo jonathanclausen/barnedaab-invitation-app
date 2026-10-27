@@ -658,6 +658,168 @@ textarea { resize: vertical; }
 .space--leaving .moon { transform: translate(30vmin, -30vmin) scale(1.6); transition-duration: 0.9s; transition-delay: 0s; }
 .space--leaving .warp-flash { opacity: 1; }
 
+/* ---------- Enhjørning-tema ---------- */
+
+.space--unicorn {
+  background:
+    radial-gradient(circle at 20% 15%, rgb(255 255 255 / 0.7), transparent 30%),
+    radial-gradient(circle at 85% 80%, rgb(255 214 236 / 0.9), transparent 40%),
+    linear-gradient(180deg, #ffd6e8 0%, #f6c6ec 40%, #e2c9ff 75%, #ffe3d1 100%);
+}
+.space--unicorn .star { background: #fff; box-shadow: 0 0 8px #ff9ed2; }
+
+.rainbow {
+  position: absolute;
+  left: -15vw;
+  top: 26vh;
+  width: 130vw;
+  height: 65vw;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.4s cubic-bezier(.5,0,.3,1) 0.3s, transform 0.9s cubic-bezier(.6,0,.9,.4), opacity 0.9s ease;
+  opacity: 0.9;
+}
+.rainbow span {
+  position: absolute;
+  left: calc(var(--i) * 3.5vw);
+  top: calc(var(--i) * 3.5vw);
+  width: calc(130vw - var(--i) * 7vw);
+  height: calc(130vw - var(--i) * 7vw);
+  border-radius: 50%;
+  border: 3.6vw solid;
+  box-sizing: border-box;
+}
+.space--unicorn.is-on .rainbow { clip-path: inset(0 0 0 0); }
+
+.cloud {
+  position: absolute;
+  width: 26vmin;
+  height: 9vmin;
+  border-radius: 9vmin;
+  background: #fff;
+  box-shadow: 0 1vmin 3vmin rgb(200 120 170 / 0.18);
+  opacity: 0.95;
+}
+.cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
+.cloud::before { width: 11vmin; height: 11vmin; left: 4vmin; top: -5.5vmin; }
+.cloud::after { width: 8vmin; height: 8vmin; left: 13vmin; top: -3.5vmin; }
+.cloud--1 { left: 4vw; top: 12vh; animation: float-cloud 9s ease-in-out infinite alternate; }
+.cloud--2 { right: -4vw; top: 30vh; transform: scale(0.8); animation: float-cloud 11s ease-in-out -3s infinite alternate-reverse; }
+.cloud--3 { left: -6vw; top: 62vh; transform: scale(1.2); animation: float-cloud 10s ease-in-out -5s infinite alternate; }
+.cloud--4 { right: 6vw; top: 82vh; animation: float-cloud 12s ease-in-out -2s infinite alternate-reverse; }
+@keyframes float-cloud { to { translate: 6vw 0; } }
+
+.hearts span {
+  position: absolute;
+  bottom: -40px;
+  color: #ff8fbf;
+  font-size: 22px;
+  text-shadow: 0 0 8px rgb(255 255 255 / 0.8);
+  animation: heart-up 4.5s ease-in infinite;
+}
+.hearts span:nth-child(3n) { color: #c7a3ff; font-size: 18px; }
+.hearts span:nth-child(4n) { color: #ffb37a; }
+@keyframes heart-up {
+  0% { opacity: 0; transform: translateY(0) rotate(0); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-105vh) rotate(25deg); }
+}
+
+.unicorn-friend { position: absolute; top: 14vh; left: -80px; font-size: 54px; opacity: 0; }
+.space--flying .unicorn-friend { animation: gallop-across 3.6s ease-in-out 0.4s both; }
+@keyframes gallop-across {
+  0% { opacity: 0; transform: translate(0, 0) scaleX(-1); }
+  10% { opacity: 1; }
+  25% { transform: translate(30vw, -4vh) scaleX(-1) rotate(-8deg); }
+  40% { transform: translate(55vw, 2vh) scaleX(-1) rotate(6deg); }
+  55% { transform: translate(80vw, -5vh) scaleX(-1) rotate(-8deg); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate(125vw, 0) scaleX(-1); }
+}
+
+.space--unicorn .stardust {
+  width: auto;
+  height: auto;
+  margin: -0.6em 0 0 -0.4em;
+  background: none;
+  box-shadow: none;
+  color: hsl(var(--hue) 95% 72%);
+  text-shadow: 0 0 6px #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+.space--unicorn .warp-flash { background: radial-gradient(circle, #fff 0%, var(--bg) 70%); }
+.space--unicorn.space--leaving .rainbow { transform: scale(2.2) translateY(10vh); opacity: 0; }
+
+/* Lyserød kuvert med vinger og en enhjørning på ryggen */
+.envelope-scene--unicorn .envelope-back { background: #f4c7d4; }
+.envelope-scene--unicorn .flap-side { fill: #fbdde5; }
+.envelope-scene--unicorn .flap-bottom { fill: #fde8ee; }
+.envelope-scene--unicorn .envelope-flap { background: linear-gradient(180deg, #f8cfdb, #f2bccb); }
+.envelope-scene--unicorn .envelope-seal { background: radial-gradient(circle at 35% 30%, #ffd1e6, #e66fa5 60%, #b8467c); }
+.envelope-scene--unicorn .envelope-to { color: #d0679a; }
+.envelope-scene--unicorn .seal-sparks span { color: #ff8fbf; text-shadow: 0 0 8px #fff; }
+.envelope-scene--unicorn .seal-sparks span:nth-child(3n) { color: #b892ff; }
+.envelope-scene--unicorn .seal-sparks span:nth-child(3n + 1) { color: #ffc46b; }
+
+.wing {
+  position: absolute;
+  top: 2%;
+  width: 42%;
+  height: 62%;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 70% 80%, #fff 0 38%, transparent 39%),
+    radial-gradient(ellipse at 50% 55%, #ffc2df 0 48%, transparent 49%),
+    radial-gradient(ellipse at 35% 30%, #c9a8ff 0 55%, transparent 56%);
+  border-radius: 80% 10% 60% 40%;
+  filter: drop-shadow(0 0 1px #b8467c) drop-shadow(0 2px 4px rgb(200 100 150 / 0.35));
+  transition: transform 0.35s cubic-bezier(.3,1.5,.5,1);
+}
+.wing--left { right: 82%; transform-origin: 100% 70%; transform: scale(0); }
+.wing--right { left: 82%; transform-origin: 0% 70%; transform: scaleX(-1) scale(0); }
+.stage-ignite .wing--left, .stage-flying .wing--left { transform: none; animation: flap-l 0.32s ease-in-out infinite alternate; }
+.stage-ignite .wing--right, .stage-flying .wing--right { transform: scaleX(-1); animation: flap-r 0.32s ease-in-out infinite alternate; }
+@keyframes flap-l { from { transform: rotate(18deg); } to { transform: rotate(-22deg); } }
+@keyframes flap-r { from { transform: scaleX(-1) rotate(18deg); } to { transform: scaleX(-1) rotate(-22deg); } }
+
+.unicorn-rider {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  top: -36%;
+  font-size: calc(var(--w) * 0.24);
+  line-height: 1;
+  transform: translateX(-50%) scale(0);
+  transition: transform 0.4s cubic-bezier(.3,1.6,.5,1), opacity 0.4s ease;
+}
+.stage-ignite .unicorn-rider, .stage-flying .unicorn-rider, .stage-landed .unicorn-rider { transform: translateX(-50%) scale(1); }
+.stage-flying .unicorn-rider { animation: ride 0.32s ease-in-out infinite alternate; }
+@keyframes ride { to { translate: 0 -6px; } }
+.stage-opening .unicorn-rider, .stage-rising .unicorn-rider, .stage-leaving .unicorn-rider {
+  transform: translate(140%, -120%) rotate(20deg) scale(0.7);
+  opacity: 0;
+  transition-duration: 0.8s;
+}
+
+.envelope-scene--unicorn.stage-ignite .envelope { animation: hop 0.3s ease-in-out infinite alternate; }
+@keyframes hop { to { transform: translateY(-8px); } }
+
+.envelope-scene--unicorn.stage-flying .envelope-flight { animation: swoop 3.8s cubic-bezier(.45,.05,.4,1) both; }
+@keyframes swoop {
+  0% { transform: translate(0, 0) rotate(0) scale(1); }
+  8% { transform: translate(0, 4vh) rotate(-4deg) scale(0.96); }
+  22% { transform: translate(-26vw, -30vh) rotate(-14deg) scale(0.55); }
+  36% { transform: translate(4vw, -14vh) rotate(8deg) scale(0.5); }
+  50% { transform: translate(28vw, -32vh) rotate(16deg) scale(0.5); }
+  64% { transform: translate(30vw, 18vh) rotate(-10deg) scale(0.6); }
+  78% { transform: translate(-24vw, 22vh) rotate(-16deg) scale(0.6); }
+  90% { transform: translate(-6vw, -4vh) rotate(6deg) scale(1.05); }
+  100% { transform: translate(0, 0) rotate(0) scale(1); }
+}
+
+.space-skip.space-skip--unicorn { background: rgb(255 255 255 / 0.85); color: #b8467c; border-color: rgb(184 70 124 / 0.35); }
+
 .space-skip {
   position: fixed;
   z-index: 30;

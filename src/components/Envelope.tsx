@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Ornament } from './Ornament'
 
+export type EnvelopeTheme = 'space' | 'unicorn'
+
 type Stage = 'closed' | 'ignite' | 'flying' | 'landed' | 'opening' | 'rising' | 'leaving'
 
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -17,6 +19,8 @@ const TIMELINE: [Stage | 'done', number][] = [
 ]
 
 const SPARKS = 18
+const DUST_GLYPHS = ['♥', '✦', '★', '♥', '•']
+const RAINBOW = ['#ff9eb5', '#ffc29e', '#ffe79e', '#b8e6b0', '#9ed4ff', '#c7b0ff']
 
 /**
  * Kuvert der letter som en raket, flyver en tur rundt i rummet, lander,
@@ -31,6 +35,7 @@ export function Envelope({
   open,
   onOpened,
   letter,
+  theme = 'space',
 }: {
   addressee?: string
   title: string
@@ -38,6 +43,7 @@ export function Envelope({
   open: boolean
   onOpened: () => void
   letter: ReactNode
+  theme?: EnvelopeTheme
 }) {
   const [stage, setStage] = useState<Stage>('closed')
   const finished = useRef(false)
@@ -76,6 +82,7 @@ export function Envelope({
       const r = env.getBoundingClientRect()
       const dust = document.createElement('span')
       dust.className = 'stardust'
+      if (theme === 'unicorn') dust.textContent = DUST_GLYPHS[Math.floor(Math.random() * DUST_GLYPHS.length)]
       dust.style.left = `${r.left + r.width / 2 + (Math.random() - 0.5) * r.width * 0.5}px`
       dust.style.top = `${r.top + r.height / 2 + (Math.random() - 0.5) * r.height * 0.5}px`
       dust.style.setProperty('--hue', String(Math.floor(Math.random() * 360)))
@@ -84,7 +91,7 @@ export function Envelope({
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [stage])
+  }, [stage, theme])
 
   const stars = useMemo(
     () =>
@@ -103,7 +110,7 @@ export function Envelope({
 
   return (
     <>
-      <div ref={spaceRef} className={`space space--${stage} ${inSpace ? 'is-on' : ''}`} aria-hidden="true">
+      <div ref={spaceRef} className={`space space--${theme} space--${stage} ${inSpace ? 'is-on' : ''}`} aria-hidden="true">
         <div className="space-stars">
           {stars.map((s) => (
             <span
@@ -113,25 +120,57 @@ export function Envelope({
             />
           ))}
         </div>
-        <div className="nebula" />
-        <div className="planet">
-          <div className="planet-ring" />
-        </div>
-        <div className="moon" />
-        <span className="shooting-star shooting-star--1" />
-        <span className="shooting-star shooting-star--2" />
-        <span className="ufo">🛸</span>
+        {theme === 'space' ? (
+          <>
+            <div className="nebula" />
+            <div className="planet">
+              <div className="planet-ring" />
+            </div>
+            <div className="moon" />
+            <span className="shooting-star shooting-star--1" />
+            <span className="shooting-star shooting-star--2" />
+            <span className="ufo">🛸</span>
+          </>
+        ) : (
+          <>
+            <div className="rainbow">
+              {RAINBOW.map((c, i) => (
+                <span key={c} style={{ borderColor: c, ['--i' as string]: i }} />
+              ))}
+            </div>
+            <span className="cloud cloud--1" />
+            <span className="cloud cloud--2" />
+            <span className="cloud cloud--3" />
+            <span className="cloud cloud--4" />
+            <span className="unicorn-friend">🦄</span>
+            <div className="hearts">
+              {Array.from({ length: 12 }, (_, i) => (
+                <span key={i} style={{ left: `${(i * 37) % 100}%`, animationDelay: `${(i * 0.43) % 4}s` }}>
+                  {i % 3 ? '♥' : '✿'}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
         <div className="warp-flash" />
       </div>
 
-      <div className={`envelope-scene stage-${stage}`}>
+      <div className={`envelope-scene envelope-scene--${theme} stage-${stage}`}>
         <div className="envelope-flight">
           <div className="envelope" ref={envelopeRef}>
-            <div className="rocket-flame" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
+            {theme === 'space' ? (
+              <div className="rocket-flame" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+            ) : (
+              <>
+                <span className="wing wing--left" aria-hidden="true" />
+                <span className="wing wing--right" aria-hidden="true" />
+                <span className="unicorn-rider" aria-hidden="true">🦄</span>
+              </>
+            )}
             <div className="envelope-back" />
             <div className="envelope-letter">
               <Ornament />
@@ -157,7 +196,7 @@ export function Envelope({
             <div className="seal-sparks" aria-hidden="true">
               {Array.from({ length: SPARKS }, (_, i) => (
                 <span key={i} style={{ ['--a' as string]: `${(360 / SPARKS) * i}deg`, ['--d' as string]: `${80 + (i % 3) * 36}px` }}>
-                  {i % 2 ? '✦' : '★'}
+                  {theme === 'unicorn' ? (i % 2 ? '♥' : '✦') : i % 2 ? '✦' : '★'}
                 </span>
               ))}
             </div>
@@ -166,7 +205,7 @@ export function Envelope({
       </div>
 
       {inSpace && (
-        <button type="button" className="space-skip" onClick={finish}>
+        <button type="button" className={`space-skip space-skip--${theme}`} onClick={finish}>
           Spring over
         </button>
       )}
