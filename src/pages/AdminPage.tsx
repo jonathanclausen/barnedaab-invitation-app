@@ -5,6 +5,7 @@ import {
   createInvite,
   deleteInvite,
   fetchEvent,
+  fetchHistory,
   inviteUrl,
   listInvites,
   login,
@@ -16,7 +17,7 @@ import {
 } from '../api'
 import { formatTimestamp } from '../format'
 import { useSite } from '../useSite'
-import { defaultEvent, type EventSettings, type Guest, type Invite } from '../types'
+import { defaultEvent, type Answer, type EventSettings, type Guest, type HistoryEntry, type Invite } from '../types'
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState<boolean | undefined>(undefined)
@@ -304,6 +305,7 @@ function useCopy() {
 
 function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitle: string; onChanged: () => void }) {
   const [editing, setEditing] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
   const { copied, copy } = useCopy()
   const title = invite.label || invite.guests.map((g) => g.name).join(' og ')
 
@@ -361,11 +363,97 @@ function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitl
         >
           Forhåndsvis
         </a>
+        <button className="btn btn--ghost btn--sm" onClick={() => setShowHistory((s) => !s)}>
+          {showHistory ? 'Skjul historik' : 'Historik'}
+        </button>
         <button className="btn btn--ghost btn--sm" onClick={() => setEditing(true)}>
           Redigér
         </button>
       </div>
+
+      {showHistory && <History inviteId={invite.id} version={`${invite.openCount}-${invite.linkVisits}-${invite.respondedAt}`} />}
     </li>
+  )
+}
+
+const answerText = (a: Answer | null | undefined) => (a === 'yes' ? 'deltager' : a === 'no' ? 'deltager ikke' : 'intet svar')
+
+/** Et besøg på linket lige før en åbning er samme besøg, så det vises kun som åbning */
+function collapse(entries: HistoryEntry[]) {
+  return entries.filter((e, i) => {
+    if (e.type !== 'visit') return true
+    const newer = entries[i - 1]
+    return !(newer?.type === 'open' && Date.parse(newer.at) - Date.parse(e.at) < 2 * 60_000)
+  })
+}
+
+function History({ inviteId, version }: { inviteId: string; version: string }) {
+  const [entries, setEntries] = useState<HistoryEntry[] | null>(null)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    fetchHistory(inviteId)
+      .then((h) => setEntries(collapse(h)))
+      .catch(() => setFailed(true))
+  }, [inviteId, version])
+
+  if (failed) return <p className="error">Kunne ikke hente historikken.</p>
+  if (!entries) return <p className="muted small">Henter historik…</p>
+  if (entries.length === 0) return <p className="muted small history-empty">Ingen aktivitet endnu.</p>
+
+  return (
+    <ol className="history">
+      {entries.map((e, i) => (
+        <li key={i} className={`history-item history-item--${e.type}`}>
+          <span className="history-dot" aria-hidden="true" />
+          <div>
+            <p className="history-what">{describe(e)}</p>
+            {e.type === 'rsvp' && <RsvpDetails entry={e} />}
+            <p className="history-when">
+              {formatTimestamp(e.at)}
+              {e.device && <> · {e.device}</>}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+function describe(e: HistoryEntry) {
+  if (e.type === 'visit') return 'Besøgte linket uden at taste koden'
+  if (e.type === 'open') return 'Åbnede invitationen'
+  return e.data.previous ? 'Ændrede svar' : 'Svarede'
+}
+
+function RsvpDetails({ entry }: { entry: HistoryEntry }) {
+  const { answers = {}, note = '', previous } = entry.data
+  return (
+    <>
+      <ul className="history-answers">
+        {Object.entries(answers).map(([name, a]) => {
+          const before = previous?.answers[name]
+          const changed = previous && before !== a
+          return (
+            <li key={name}>
+              {name}:{' '}
+              {changed && <span className="history-old">{answerText(before)}</span>}
+              {changed && ' → '}
+              <span className={`history-answer history-answer--${a ?? 'pending'}`}>{answerText(a)}</span>
+            </li>
+          )
+        })}
+      </ul>
+      {previous && previous.note !== note ? (
+        <p className="history-note">
+          Note: {previous.note && <span className="history-old">“{previous.note}”</span>}
+          {previous.note && ' → '}
+          {note ? `“${note}”` : <em>fjernet</em>}
+        </p>
+      ) : (
+        note && <p className="history-note">Note: “{note}”</p>
+      )}
+    </>
   )
 }
 

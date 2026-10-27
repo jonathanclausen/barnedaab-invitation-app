@@ -29,6 +29,17 @@ export interface Invite extends GuestInvite {
   createdAt: string
 }
 
+export interface HistoryEntry {
+  type: 'visit' | 'open' | 'rsvp'
+  at: string
+  device: string
+  data: {
+    answers?: Record<string, Answer | null>
+    note?: string
+    previous?: { answers: Record<string, Answer | null>; note: string }
+  }
+}
+
 export interface EventSettings {
   /** Navnet på siden, f.eks. "Emmas barnedåb" (vises før koden er tastet) */
   siteTitle: string

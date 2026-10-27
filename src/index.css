@@ -463,3 +463,19 @@ textarea { resize: vertical; }
 .homescreen-help ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
 .homescreen-help p { margin: 0; }
 .share-icon { width: 18px; height: 18px; vertical-align: -3px; color: #2f7cf6; }
+
+/* ---------- Historik ---------- */
+
+.history { list-style: none; margin: 0; padding: 4px 0 0 4px; border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 12px; max-height: 360px; overflow-y: auto; }
+.history-item { display: flex; gap: 12px; align-items: flex-start; }
+.history-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); margin-top: 7px; flex-shrink: 0; }
+.history-item--open .history-dot { background: var(--sage); }
+.history-item--rsvp .history-dot { background: var(--gold); }
+.history-what { margin: 0; font-weight: 500; font-size: 0.92rem; }
+.history-when { margin: 2px 0 0; font-size: 0.8rem; color: var(--muted); }
+.history-answers { list-style: none; margin: 4px 0 0; padding: 0; font-size: 0.88rem; }
+.history-note { margin: 4px 0 0; font-size: 0.88rem; }
+.history-old { color: var(--muted); text-decoration: line-through; }
+.history-answer--yes { color: var(--sage-deep); }
+.history-answer--no { color: var(--rose-deep); }
+.history-empty { border-top: 1px solid var(--line); padding-top: 12px; margin: 0; }

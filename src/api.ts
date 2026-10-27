@@ -1,4 +1,4 @@
-import { defaultEvent, type Answer, type EventSettings, type Guest, type GuestInvite, type Invite, type SiteInfo } from './types'
+import { defaultEvent, type Answer, type EventSettings, type Guest, type GuestInvite, type HistoryEntry, type Invite, type SiteInfo } from './types'
 
 export class ApiError extends Error {
   status: number
@@ -63,6 +63,7 @@ export const createInvite = (label: string, greeting: string, names: string[]) =
 export const updateInvite = (id: string, label: string, greeting: string, guests: Guest[]) =>
   call<Invite>('PUT', `admin/invites/${id}`, { label, greeting, guests })
 export const deleteInvite = (id: string) => call('DELETE', `admin/invites/${id}`)
+export const fetchHistory = (id: string) => call<HistoryEntry[]>('GET', `admin/invites/${id}/history`)
 export const resetOpens = (id: string) => call('POST', `admin/invites/${id}/reset`)
 
 export const fetchEvent = () =>

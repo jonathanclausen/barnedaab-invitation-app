@@ -145,3 +145,21 @@ export async function isAdmin(request: Request, env: Env) {
   if (!exp || !sig || Number(exp) < Date.now()) return false
   return safeEqual(sig, await hmac(env.ADMIN_PASSWORD, exp))
 }
+
+// ---------- Historik ----------
+
+export type EventType = 'visit' | 'open' | 'rsvp'
+
+/** Groft gæt på enheden ud fra browserens user agent, f.eks. "iPhone" eller "Android" */
+export function deviceOf(request: Request) {
+  const ua = request.headers.get('user-agent') ?? ''
+  const device = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : ''
+  const app = /FBAN|FBAV|FB_IAB|Messenger/.test(ua) ? 'Messenger' : /Instagram/.test(ua) ? 'Instagram' : ''
+  return [device, app && `via ${app}`].filter(Boolean).join(' ')
+}
+
+export function logEvent(env: Env, request: Request, inviteId: string, type: EventType, at: string, data: unknown = {}) {
+  return env.DB.prepare('INSERT INTO invite_events (invite_id, type, at, device, data) VALUES (?, ?, ?, ?, ?)')
+    .bind(inviteId, type, at, deviceOf(request), JSON.stringify(data))
+    .run()
+}

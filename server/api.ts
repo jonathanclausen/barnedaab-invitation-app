@@ -7,6 +7,7 @@ import {
   getInviteRow,
   isAdmin,
   json,
+  logEvent,
   newCode,
   newInviteId,
   now,
@@ -49,6 +50,7 @@ const openInvite: Handler = async ({ request, env, params }) => {
     )
       .bind(t, t, row.id)
       .run()
+    await logEvent(env, request, row.id, 'open', t)
   }
   return json({ invite: toGuestInvite(row), event: await getEvent(env) })
 }
@@ -56,9 +58,11 @@ const openInvite: Handler = async ({ request, env, params }) => {
 /** Tæller besøg på linket, også før koden er tastet */
 const visit: Handler = async ({ request, env, params }) => {
   if (!(await isAdmin(request, env))) {
-    await env.DB.prepare('UPDATE invites SET link_visits = link_visits + 1, last_visit_at = ? WHERE id = ?')
-      .bind(now(), params.id)
+    const t = now()
+    const { meta } = await env.DB.prepare('UPDATE invites SET link_visits = link_visits + 1, last_visit_at = ? WHERE id = ?')
+      .bind(t, params.id)
       .run()
+    if (meta.changes > 0) await logEvent(env, request, params.id, 'visit', t)
   }
   return json({ ok: true })
 }
@@ -81,6 +85,13 @@ const rsvp: Handler = async ({ request, env, params }) => {
   await env.DB.prepare('UPDATE invites SET rsvp = ?, note = ?, responded_at = ? WHERE id = ?')
     .bind(JSON.stringify(answers), note, t, row.id)
     .run()
+  const guests = JSON.parse(row.guests) as { id: string; name: string }[]
+  const named = (r: Record<string, string>) => Object.fromEntries(guests.map((g) => [g.name, r[g.id] ?? null]))
+  await logEvent(env, request, row.id, 'rsvp', t, {
+    answers: named(answers),
+    note,
+    ...(row.responded_at ? { previous: { answers: named(JSON.parse(row.rsvp)), note: row.note } } : {}),
+  })
   return json({ invite: { ...toGuestInvite(row), rsvp: answers, note, respondedAt: t } })
 }
 
@@ -145,7 +156,10 @@ const updateInvite: Handler = async ({ request, env, params }) => {
 }
 
 const deleteInvite: Handler = async ({ env, params }) => {
-  await env.DB.prepare('DELETE FROM invites WHERE id = ?').bind(params.id).run()
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM invites WHERE id = ?').bind(params.id),
+    env.DB.prepare('DELETE FROM invite_events WHERE invite_id = ?').bind(params.id),
+  ])
   return json({ ok: true })
 }
 
@@ -156,7 +170,18 @@ const resetOpens: Handler = async ({ env, params }) => {
   )
     .bind(params.id)
     .run()
+  // Svar bliver i historikken, besøg og åbninger ryger
+  await env.DB.prepare("DELETE FROM invite_events WHERE invite_id = ? AND type IN ('visit', 'open')").bind(params.id).run()
   return json({ ok: true })
+}
+
+const history: Handler = async ({ env, params }) => {
+  const { results } = await env.DB.prepare(
+    'SELECT type, at, device, data FROM invite_events WHERE invite_id = ? ORDER BY at DESC, id DESC LIMIT 500',
+  )
+    .bind(params.id)
+    .all<{ type: string; at: string; device: string; data: string }>()
+  return json(results.map((r) => ({ ...r, data: JSON.parse(r.data) })))
 }
 
 /** Web-app-manifest, så invitationen kan lægges på hjemmeskærmen og åbne direkte */
@@ -203,6 +228,7 @@ const routes: Route[] = [
   ['PUT', '/api/admin/invites/:id', updateInvite, true],
   ['DELETE', '/api/admin/invites/:id', deleteInvite, true],
   ['POST', '/api/admin/invites/:id/reset', resetOpens, true],
+  ['GET', '/api/admin/invites/:id/history', history, true],
 ]
 
 function match(pattern: string, path: string) {
