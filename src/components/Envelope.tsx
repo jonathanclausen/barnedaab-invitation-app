@@ -19,7 +19,6 @@ const TIMELINE: [Stage | 'done', number][] = [
 ]
 
 const SPARKS = 18
-const RAINBOW = ['#d9a0a4', '#e6b9a0', '#e8d3a6', '#b9c8b0', '#aebfcf', '#c3b2cc']
 
 /**
  * Kuvert der letter som en raket, flyver en tur rundt i rummet, lander,
@@ -76,7 +75,7 @@ export function Envelope({
     let last = 0
     const tick = (t: number) => {
       frame = requestAnimationFrame(tick)
-      if (t - last < 28) return
+      if (t - last < (theme === 'unicorn' ? 45 : 28)) return
       last = t
       const r = env.getBoundingClientRect()
       const dust = document.createElement('span')
@@ -131,24 +130,23 @@ export function Envelope({
           </>
         ) : (
           <>
-            <div className="rainbow">
-              {RAINBOW.map((c, i) => (
-                <span key={c} style={{ borderColor: c, ['--i' as string]: i }} />
-              ))}
-            </div>
+            <div className="halo" />
             <span className="mist mist--1" />
             <span className="mist mist--2" />
-            <span className="mist mist--3" />
-            <UnicornLine />
+            <div className="emblem">
+              <UnicornLine />
+              <p className="emblem-text">Et lille brev er på vej</p>
+            </div>
             <div className="petals">
-              {Array.from({ length: 14 }, (_, i) => (
+              {Array.from({ length: 9 }, (_, i) => (
                 <span
                   key={i}
                   style={{
                     left: `${(i * 41) % 100}%`,
                     animationDelay: `${-((i * 0.77) % 7)}s`,
-                    animationDuration: `${6 + (i % 4)}s`,
-                    ['--s' as string]: 0.6 + (i % 3) * 0.25,
+                    animationDuration: `${9 + (i % 4) * 1.5}s`,
+                    ['--s' as string]: i % 4 === 0 ? 2.4 : 0.8 + (i % 3) * 0.25,
+                    filter: i % 4 === 0 ? 'blur(3px)' : undefined,
                   }}
                 />
               ))}
@@ -215,17 +213,35 @@ export function Envelope({
   )
 }
 
-/** Enhjørning tegnet med én tynd guldstreg, der tegner sig selv */
+/** Enhjørning i en fin guldstreg inde i en cirkel, der tegner sig selv */
 function UnicornLine() {
   return (
-    <svg className="unicorn-line" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-      <path pathLength="1" d="M62 192 C 58 160, 60 120, 74 96 C 80 84, 84 74, 86 58 C 92 64, 96 70, 100 74 C 116 76, 128 86, 140 100 C 150 110, 160 118, 164 128 C 167 136, 162 142, 154 142 C 146 142, 138 138, 130 134 C 124 140, 118 150, 114 162 C 112 172, 114 182, 120 192" />
-      <path pathLength="1" d="M104 74 L 138 20 L 112 80" />
-      <path pathLength="1" d="M109 66 L 118 66 M116 55 L 123 54 M123 44 L 128 42 M129 34 L 134 30" />
-      <path pathLength="1" d="M118 98 C 121 96, 125 96, 127 99" />
-      <path pathLength="1" d="M155 129 C 156 131, 156 133, 154 134" />
-      <path pathLength="1" d="M86 62 C 70 68, 60 82, 64 98 C 52 106, 48 120, 56 132 C 44 140, 42 156, 50 166 C 40 172, 36 184, 40 192" />
-      <path pathLength="1" d="M84 76 C 74 86, 72 100, 78 110 C 70 120, 70 134, 76 142" />
+    <svg className="unicorn-line" viewBox="-14 -14 228 228" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="gold-foil" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#e9d3a0" />
+          <stop offset="0.45" stopColor="#b8935a" />
+          <stop offset="0.7" stopColor="#d9bd84" />
+          <stop offset="1" stopColor="#9c7a45" />
+        </linearGradient>
+        <clipPath id="emblem-clip">
+          <circle cx="100" cy="100" r="96" />
+        </clipPath>
+      </defs>
+      <g stroke="url(#gold-foil)">
+        <circle className="ring" pathLength="1" cx="100" cy="100" r="104" transform="rotate(-90 100 100)" />
+        <circle className="ring ring--inner" pathLength="1" cx="100" cy="100" r="99" transform="rotate(90 100 100)" />
+        <g clipPath="url(#emblem-clip)" transform="translate(6 10)">
+          <path pathLength="1" d="M62 192 C 58 160, 60 120, 74 96 C 80 84, 84 74, 86 58 C 92 64, 96 70, 100 74 C 116 76, 128 86, 140 100 C 150 110, 160 118, 164 128 C 167 136, 162 142, 154 142 C 146 142, 138 138, 130 134 C 124 140, 118 150, 114 162 C 112 172, 114 182, 120 192" />
+          <path pathLength="1" d="M104 74 L 138 20 L 112 80" />
+          <path pathLength="1" d="M109 66 L 118 66 M116 55 L 123 54 M123 44 L 128 42 M129 34 L 134 30" />
+          <path pathLength="1" d="M118 98 C 121 96, 125 96, 127 99" />
+          <path pathLength="1" d="M155 129 C 156 131, 156 133, 154 134" />
+          <path pathLength="1" d="M86 62 C 70 68, 60 82, 64 98 C 52 106, 48 120, 56 132 C 44 140, 42 156, 50 166 C 40 172, 36 184, 40 192" />
+          <path pathLength="1" d="M84 76 C 74 86, 72 100, 78 110 C 70 120, 70 134, 76 142" />
+        </g>
+        <path className="twinkle" pathLength="1" d="M168 34 l 0 -10 M163 29 l 10 0 M40 160 l 0 -7 M36.5 156.5 l 7 0 M30 48 l 0 -6 M27 45 l 6 0" />
+      </g>
     </svg>
   )
 }
@@ -235,8 +251,8 @@ function Wing({ side }: { side: 'left' | 'right' }) {
   return (
     <span className={`wing wing--${side}`} aria-hidden="true">
       <svg viewBox="0 0 100 60">
-        <path d="M100 40 C 70 8, 32 0, 0 6 C 14 13, 18 17, 14 22 C 28 23, 33 27, 27 32 C 41 33, 46 37, 40 43 C 54 43, 61 47, 57 54 C 72 52, 87 49, 100 40 Z" />
-        <path className="wing-vein" d="M96 40 C 70 26, 40 14, 8 8 M90 42 C 66 32, 46 26, 22 24 M84 44 C 66 38, 52 36, 34 34 M78 46 C 68 44, 60 44, 48 45" />
+        <path d="M100 42 C 78 14, 44 2, 2 4 C 20 10, 30 14, 34 18 C 18 18, 10 20, 6 24 C 24 26, 36 28, 40 32 C 26 34, 18 38, 14 44 C 32 42, 46 42, 52 46 C 42 50, 38 54, 36 60 C 56 54, 80 52, 100 42 Z" />
+        <path className="wing-vein" d="M96 40 C 70 24, 40 12, 10 7 M90 42 C 66 32, 40 26, 14 24 M84 45 C 64 40, 44 40, 22 42 M76 48 C 62 50, 50 54, 42 57" />
       </svg>
     </span>
   )
