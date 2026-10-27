@@ -1,6 +1,12 @@
-name = "barnedaab-invitation"
+name = "barnedaab-invitation-app"
+main = "server/index.ts"
 compatibility_date = "2026-10-01"
-pages_build_output_dir = "dist"
+
+# Frontend (vite build) serveres som statiske filer. /api/* går til workeren.
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
 
 [[d1_databases]]
 binding = "DB"

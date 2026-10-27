@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && tsc -p functions/tsconfig.json && vite build",
-    "preview": "npm run build && wrangler pages dev dist",
+    "build": "tsc -b && tsc -p server/tsconfig.json && vite build",
+    "preview": "npm run build && wrangler dev --port 8788",
     "db:migrate:local": "wrangler d1 migrations apply barnedaab-invitation --local",
     "lint": "oxlint"
   },

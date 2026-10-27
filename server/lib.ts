@@ -9,7 +9,7 @@ export interface Guest {
   name: string
 }
 
-interface InviteRow {
+export interface InviteRow {
   id: string
   code: string
   label: string
