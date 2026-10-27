@@ -188,6 +188,7 @@ textarea { resize: vertical; }
 .detail-time { font-weight: 600; margin-bottom: 2px; }
 .detail-place { margin-bottom: 2px; }
 .map-link { font-size: 0.92rem; }
+.wishlist .btn { margin-top: 4px; }
 @media (max-width: 520px) { .details { grid-template-columns: 1fr; } }
 
 .guest-list { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }

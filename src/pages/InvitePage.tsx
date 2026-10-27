@@ -205,6 +205,15 @@ function Invitation({
             <p className="prewrap">{event.practical}</p>
           </div>
         )}
+        {/^https?:\/\//i.test(event.wishlistUrl) && (
+          <div className="detail detail--wide wishlist">
+            <h2>Ønsker</h2>
+            {event.wishlistText && <p className="prewrap">{event.wishlistText}</p>}
+            <a className="btn btn--ghost" href={event.wishlistUrl} target="_blank" rel="noreferrer">
+              Se ønskelisten
+            </a>
+          </div>
+        )}
       </section>
 
       <section className="card rsvp fade-in">

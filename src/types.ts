@@ -45,6 +45,9 @@ export interface EventSettings {
   receptionTime: string
   rsvpBy: string
   practical: string
+  /** Link til ønskeliste, f.eks. Ønskeskyen */
+  wishlistUrl: string
+  wishlistText: string
   signature: string
 }
 
@@ -67,5 +70,7 @@ export const defaultEvent: EventSettings = {
   receptionTime: '',
   rsvpBy: '',
   practical: '',
+  wishlistUrl: '',
+  wishlistText: '',
   signature: 'Kærlig hilsen',
 }

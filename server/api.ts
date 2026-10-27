@@ -24,7 +24,7 @@ type Handler = (ctx: Ctx) => Promise<Response>
 
 const EVENT_FIELDS = [
   'siteTitle', 'monogram', 'title', 'intro', 'date', 'churchTime', 'church', 'churchAddress',
-  'reception', 'receptionAddress', 'receptionTime', 'rsvpBy', 'practical', 'signature',
+  'reception', 'receptionAddress', 'receptionTime', 'rsvpBy', 'practical', 'wishlistUrl', 'wishlistText', 'signature',
 ]
 
 // ---------- Offentligt ----------

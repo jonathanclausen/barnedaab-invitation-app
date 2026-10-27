@@ -570,6 +570,15 @@ function EventForm() {
         <span>Praktisk info (valgfri)</span>
         <textarea rows={3} value={event.practical} onChange={set('practical')} placeholder="Parkering, gaveønsker, påklædning …" />
       </label>
+      <h3 className="subhead">Ønskeliste</h3>
+      <label className="field">
+        <span>Link (f.eks. fra Ønskeskyen)</span>
+        <input type="url" value={event.wishlistUrl} onChange={set('wishlistUrl')} placeholder="https://onskeskyen.dk/..." />
+      </label>
+      <label className="field">
+        <span>Tekst over knappen (valgfri)</span>
+        <input value={event.wishlistText} onChange={set('wishlistText')} placeholder="Har I lyst til at give en gave, har vi samlet nogle idéer her." />
+      </label>
       <label className="field">
         <span>Underskrift</span>
         <input value={event.signature} onChange={set('signature')} placeholder="Kærlig hilsen …" />
