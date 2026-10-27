@@ -23,7 +23,7 @@ type Ctx = { request: Request; env: Env; params: Record<string, string> }
 type Handler = (ctx: Ctx) => Promise<Response>
 
 const EVENT_FIELDS = [
-  'siteTitle', 'monogram', 'title', 'intro', 'date', 'churchTime', 'church', 'churchAddress', 'churchParking', 'receptionParking', 'endTime',
+  'siteTitle', 'monogram', 'title', 'intro', 'date', 'churchTime', 'church', 'churchAddress', 'churchParking', 'receptionParking',
   'reception', 'receptionAddress', 'receptionTime', 'rsvpBy', 'practical', 'wishlistUrl', 'wishlistText', 'signature',
 ]
 

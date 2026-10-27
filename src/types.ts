@@ -45,8 +45,6 @@ export interface EventSettings {
   receptionAddress: string
   receptionTime: string
   receptionParking: string
-  /** Hvornår det hele slutter (bruges i kalenderen) */
-  endTime: string
   rsvpBy: string
   practical: string
   /** Link til ønskeliste, f.eks. Ønskeskyen */
@@ -74,7 +72,6 @@ export const defaultEvent: EventSettings = {
   receptionAddress: '',
   receptionTime: '',
   receptionParking: '',
-  endTime: '',
   rsvpBy: '',
   practical: '',
   wishlistUrl: '',

@@ -5,7 +5,6 @@ import { formatDate, formatShortDate, joinNames } from '../format'
 import type { Answer, EventSettings, GuestInvite } from '../types'
 import { Ornament } from '../components/Ornament'
 import { Envelope } from '../components/Envelope'
-import { AddToCalendar } from '../components/AddToCalendar'
 import { Location } from '../components/Location'
 import { AddToHomeScreen } from '../components/AddToHomeScreen'
 import { setManifestStart } from '../install'
@@ -188,7 +187,6 @@ function Invitation({
         <p className="eyebrow">Kære {invite.label || names}</p>
         <h1 className="display">{event.title}</h1>
         {event.date && <p className="hero-date">{formatDate(event.date)}</p>}
-        <AddToCalendar event={event} />
         <p className="lead">{event.intro}</p>
         {invite.greeting && <p className="greeting">{invite.greeting}</p>}
       </section>

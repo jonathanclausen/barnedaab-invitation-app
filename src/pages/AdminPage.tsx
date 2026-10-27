@@ -574,10 +574,7 @@ function EventForm() {
         <span>Parkering (valgfri)</span>
         <input value={event.receptionParking} onChange={set('receptionParking')} placeholder="Der kan parkeres på vejen" />
       </label>
-      <label className="field">
-        <span>Slutter ca. (bruges i kalenderinvitationen)</span>
-        <input type="time" value={event.endTime} onChange={set('endTime')} />
-      </label>
+
       <label className="field">
         <span>Praktisk info (valgfri)</span>
         <textarea rows={3} value={event.practical} onChange={set('practical')} placeholder="Parkering, gaveønsker, påklædning …" />
