@@ -1,0 +1,9 @@
+name = "barnedaab-invitation"
+compatibility_date = "2026-10-01"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "barnedaab-invitation"
+database_id = "f1f8a80d-4d1a-4587-a18d-56119dd5ac26"
+migrations_dir = "migrations"
