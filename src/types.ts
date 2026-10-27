@@ -40,9 +40,13 @@ export interface EventSettings {
   churchTime: string
   church: string
   churchAddress: string
+  churchParking: string
   reception: string
   receptionAddress: string
   receptionTime: string
+  receptionParking: string
+  /** Hvornår det hele slutter (bruges i kalenderen) */
+  endTime: string
   rsvpBy: string
   practical: string
   /** Link til ønskeliste, f.eks. Ønskeskyen */
@@ -65,9 +69,12 @@ export const defaultEvent: EventSettings = {
   churchTime: '',
   church: '',
   churchAddress: '',
+  churchParking: '',
   reception: '',
   receptionAddress: '',
   receptionTime: '',
+  receptionParking: '',
+  endTime: '',
   rsvpBy: '',
   practical: '',
   wishlistUrl: '',

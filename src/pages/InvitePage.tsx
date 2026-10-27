@@ -5,6 +5,10 @@ import { formatDate, formatShortDate, joinNames } from '../format'
 import type { Answer, EventSettings, GuestInvite } from '../types'
 import { Ornament } from '../components/Ornament'
 import { Envelope } from '../components/Envelope'
+import { AddToCalendar } from '../components/AddToCalendar'
+import { Location } from '../components/Location'
+import { AddToHomeScreen } from '../components/AddToHomeScreen'
+import { setManifestStart } from '../install'
 import { useSite } from '../useSite'
 
 const storageKey = (inviteId: string) => `invite-code-${inviteId}`
@@ -53,6 +57,11 @@ export default function InvitePage() {
       }
       if (!preview) storeCode(inviteId, candidate.trim())
       setUsedCode(candidate.trim())
+      if (!preview) {
+        // Ikonet på hjemmeskærmen skal åbne invitationen direkte (iPhone deler ikke koden med Safari)
+        setManifestStart(`/i/${inviteId}?code=${encodeURIComponent(candidate.trim())}`)
+        if (params.has('code')) window.history.replaceState(null, '', `/i/${inviteId}`)
+      }
       setEvent(found.event)
       setInvite(found.invite)
     } catch {
@@ -179,6 +188,7 @@ function Invitation({
         <p className="eyebrow">Kære {invite.label || names}</p>
         <h1 className="display">{event.title}</h1>
         {event.date && <p className="hero-date">{formatDate(event.date)}</p>}
+        <AddToCalendar event={event} />
         <p className="lead">{event.intro}</p>
         {invite.greeting && <p className="greeting">{invite.greeting}</p>}
       </section>
@@ -188,7 +198,7 @@ function Invitation({
           <h2>Dåben</h2>
           {event.churchTime && <p className="detail-time">Kl. {event.churchTime}</p>}
           {event.church && <p className="detail-place">{event.church}</p>}
-          {event.churchAddress && <MapLink address={event.churchAddress} />}
+          <Location address={event.churchAddress} parking={event.churchParking} />
           {!event.church && !event.churchTime && <p className="muted">Detaljer følger</p>}
         </div>
         {(event.reception || event.receptionAddress) && (
@@ -196,7 +206,7 @@ function Invitation({
             <h2>Bagefter</h2>
             {event.receptionTime && <p className="detail-time">Kl. {event.receptionTime}</p>}
             {event.reception && <p className="detail-place">{event.reception}</p>}
-            {event.receptionAddress && <MapLink address={event.receptionAddress} />}
+            <Location address={event.receptionAddress} parking={event.receptionParking} />
           </div>
         )}
         {event.practical && (
@@ -285,19 +295,13 @@ function Invitation({
         )}
       </section>
 
+      {!preview && <AddToHomeScreen />}
+
       {event.signature && (
         <p className="signature">
           {event.signature}
         </p>
       )}
     </main>
-  )
-}
-
-function MapLink({ address }: { address: string }) {
-  return (
-    <a className="map-link" href={`https://maps.google.com/?q=${encodeURIComponent(address)}`} target="_blank" rel="noreferrer">
-      {address}
-    </a>
   )
 }

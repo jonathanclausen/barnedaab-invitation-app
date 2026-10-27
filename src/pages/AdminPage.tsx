@@ -549,7 +549,11 @@ function EventForm() {
       </div>
       <label className="field">
         <span>Adresse</span>
-        <input value={event.churchAddress} onChange={set('churchAddress')} />
+        <input value={event.churchAddress} onChange={set('churchAddress')} placeholder="Vej 1, 1234 By" />
+      </label>
+      <label className="field">
+        <span>Parkering (valgfri)</span>
+        <input value={event.churchParking} onChange={set('churchParking')} placeholder="Gratis parkering bag kirken" />
       </label>
       <h3 className="subhead">Bagefter</h3>
       <div className="grid-2">
@@ -564,7 +568,15 @@ function EventForm() {
       </div>
       <label className="field">
         <span>Adresse</span>
-        <input value={event.receptionAddress} onChange={set('receptionAddress')} />
+        <input value={event.receptionAddress} onChange={set('receptionAddress')} placeholder="Vej 2, 1234 By" />
+      </label>
+      <label className="field">
+        <span>Parkering (valgfri)</span>
+        <input value={event.receptionParking} onChange={set('receptionParking')} placeholder="Der kan parkeres på vejen" />
+      </label>
+      <label className="field">
+        <span>Slutter ca. (bruges i kalenderinvitationen)</span>
+        <input type="time" value={event.endTime} onChange={set('endTime')} />
       </label>
       <label className="field">
         <span>Praktisk info (valgfri)</span>

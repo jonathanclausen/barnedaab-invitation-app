@@ -23,7 +23,7 @@ type Ctx = { request: Request; env: Env; params: Record<string, string> }
 type Handler = (ctx: Ctx) => Promise<Response>
 
 const EVENT_FIELDS = [
-  'siteTitle', 'monogram', 'title', 'intro', 'date', 'churchTime', 'church', 'churchAddress',
+  'siteTitle', 'monogram', 'title', 'intro', 'date', 'churchTime', 'church', 'churchAddress', 'churchParking', 'receptionParking', 'endTime',
   'reception', 'receptionAddress', 'receptionTime', 'rsvpBy', 'practical', 'wishlistUrl', 'wishlistText', 'signature',
 ]
 
@@ -159,12 +159,37 @@ const resetOpens: Handler = async ({ env, params }) => {
   return json({ ok: true })
 }
 
+/** Web-app-manifest, så invitationen kan lægges på hjemmeskærmen og åbne direkte */
+const manifest: Handler = async ({ request, env }) => {
+  const start = new URL(request.url).searchParams.get('start') ?? '/'
+  const event = await getEvent(env)
+  const name = event.siteTitle || 'Invitation'
+  return json(
+    {
+      name,
+      short_name: name.length > 14 ? 'Invitation' : name,
+      start_url: start.startsWith('/i/') ? start : '/',
+      scope: '/',
+      display: 'standalone',
+      background_color: '#f7f2ea',
+      theme_color: '#f7f2ea',
+      icons: [
+        { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+      ],
+    },
+    200,
+    { 'content-type': 'application/manifest+json' },
+  )
+}
+
 // ---------- Routing ----------
 
 type Route = [method: string, pattern: string, handler: Handler, admin?: boolean]
 
 const routes: Route[] = [
   ['GET', '/api/site', site],
+  ['GET', '/api/manifest', manifest],
   ['POST', '/api/invite/:id/open', openInvite],
   ['POST', '/api/invite/:id/visit', visit],
   ['POST', '/api/invite/:id/rsvp', rsvp],
