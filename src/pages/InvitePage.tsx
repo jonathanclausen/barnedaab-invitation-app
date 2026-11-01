@@ -32,7 +32,7 @@ export default function InvitePage() {
   const { inviteId = '' } = useParams()
   const [params] = useSearchParams()
   const preview = params.get('preview') === '1'
-  const theme = params.get('tema') === 'enhjoerning' ? 'unicorn' : 'space'
+  const theme = params.get('tema') === 'rum' ? 'space' : 'unicorn'
   const initialCode = params.get('code') ?? readStoredCode(inviteId)
   const site = useSite()
 
