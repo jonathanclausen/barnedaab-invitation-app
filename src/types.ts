@@ -26,6 +26,8 @@ export interface Invite extends GuestInvite {
   lastOpenedAt: string | null
   linkVisits: number
   lastVisitAt: string | null
+  /** Hvornår invitationen er markeret som sendt; null = ikke sendt */
+  sentAt: string | null
   createdAt: string
 }
 

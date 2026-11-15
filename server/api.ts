@@ -209,6 +209,19 @@ const resetOpens: Handler = async ({ env, params }) => {
   return json({ ok: true })
 }
 
+/** Markér invitationen som sendt (eller fortryd). Bevarer første afsendelsestidspunkt. */
+const markSent: Handler = async ({ request, env, params }) => {
+  const body = await readJson(request)
+  const sent = body.sent !== false
+  const { meta } = await env.DB.prepare(
+    sent ? 'UPDATE invites SET sent_at = COALESCE(sent_at, ?) WHERE id = ?' : 'UPDATE invites SET sent_at = NULL WHERE id = ?',
+  )
+    .bind(...(sent ? [now(), params.id] : [params.id]))
+    .run()
+  if (!meta.changes) return json({ error: 'not-found' }, 404)
+  return json(toInvite((await getInviteRow(env, params.id))!))
+}
+
 const history: Handler = async ({ env, params }) => {
   const { results } = await env.DB.prepare(
     'SELECT type, at, device, data FROM invite_events WHERE invite_id = ? ORDER BY at DESC, id DESC LIMIT 500',
@@ -262,6 +275,7 @@ const routes: Route[] = [
   ['PUT', '/api/admin/invites/:id', updateInvite, true],
   ['DELETE', '/api/admin/invites/:id', deleteInvite, true],
   ['POST', '/api/admin/invites/:id/reset', resetOpens, true],
+  ['POST', '/api/admin/invites/:id/sent', markSent, true],
   ['GET', '/api/admin/invites/:id/history', history, true],
 ]
 
