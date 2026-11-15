@@ -94,6 +94,12 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [loadError, setLoadError] = useState(false)
   const [tab, setTab] = useState<'invites' | 'event'>('invites')
   const [filter, setFilter] = useState<Filter>('all')
+  const [eventTitle, setEventTitle] = useState('')
+
+  // Overskriften bruges i beskeden der kopieres; hentes igen når man skifter fane (hvis den er rettet)
+  useEffect(() => {
+    if (tab === 'invites') fetchEvent().then((e) => setEventTitle(e.title)).catch(() => {})
+  }, [tab])
 
   const reload = useCallback(async () => {
     try {
@@ -196,7 +202,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
           ) : (
             <ul className="invite-list">
               {visible.map((i) => (
-                <InviteCard key={i.id} invite={i} siteTitle={siteTitle} onChanged={reload} />
+                <InviteCard key={i.id} invite={i} siteTitle={siteTitle} eventTitle={eventTitle} onChanged={reload} />
               ))}
             </ul>
           )}
@@ -290,10 +296,13 @@ function NewInviteForm({ onCreated }: { onCreated: () => void }) {
   )
 }
 
-function shareMessage(invite: Invite, siteTitle: string) {
-  const greetingName = pluralize(invite.label, invite.guests.length > 1) || invite.guests.map((g) => g.name).join(' og ')
+/** Beskeden der sendes til gæsterne. Overskriften fra "Dagens detaljer" bruges, f.eks. "{Du/I} er inviteret til …" */
+function shareMessage(invite: Invite, siteTitle: string, eventTitle: string) {
   const plural = invite.guests.length > 1
-  return `Kære ${greetingName}\n\n${plural ? 'I' : 'Du'} er inviteret: ${pluralize(siteTitle, plural)} 🤍\n\nÅbn ${plural ? 'jeres' : 'din'} invitation her og svar, om ${plural ? 'I' : 'du'} kan komme:\n${inviteUrl(invite.id)}\n\nKode: ${invite.code}`
+  const greetingName = pluralize(invite.label, plural) || invite.guests.map((g) => g.name).join(' og ')
+  const title = pluralize(eventTitle.trim(), plural)
+  const invited = title ? (/[.!?]$/.test(title) ? title : `${title}.`) : `${plural ? 'I' : 'Du'} er inviteret: ${pluralize(siteTitle, plural)}`
+  return `Kære ${greetingName}! ${invited}\n\nÅbn her ${plural ? 'jeres' : 'din'} invitation og svar, om ${plural ? 'I' : 'du'} kan komme:\n${inviteUrl(invite.id)}\n\nKode: ${invite.code}`
 }
 
 function useCopy() {
@@ -310,7 +319,17 @@ function useCopy() {
   return { copied, copy }
 }
 
-function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitle: string; onChanged: () => void }) {
+function InviteCard({
+  invite,
+  siteTitle,
+  eventTitle,
+  onChanged,
+}: {
+  invite: Invite
+  siteTitle: string
+  eventTitle: string
+  onChanged: () => void
+}) {
   const [editing, setEditing] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const { copied, copy } = useCopy()
@@ -373,7 +392,7 @@ function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitl
         <button
           className="btn btn--primary btn--sm"
           onClick={() => {
-            copy(shareMessage(invite, siteTitle), 'msg')
+            copy(shareMessage(invite, siteTitle, eventTitle), 'msg')
             // Kopierer man beskeden, er det for at sende den – markér den som sendt
             if (!invite.sentAt) setSent(true)
           }}
