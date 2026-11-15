@@ -647,7 +647,7 @@ function EventForm() {
         <span>Parkering (valgfri)</span>
         <input value={event.churchParking} onChange={set('churchParking')} placeholder="Gratis parkering bag kirken" />
       </label>
-      <h3 className="subhead">Bagefter</h3>
+      <h3 className="subhead">Frokost</h3>
       <div className="grid-2">
         <label className="field">
           <span>Sted</span>
