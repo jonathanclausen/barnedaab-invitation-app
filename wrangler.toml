@@ -2,11 +2,15 @@ name = "barnedaab-invitation-app"
 main = "server/index.ts"
 compatibility_date = "2026-10-01"
 
-# Frontend (vite build) serveres som statiske filer. /api/* går til workeren.
+# Frontend (vite build) serveres som statiske filer via workeren, så den kan
+# sende www.<domæne> videre til <domæne>. /api/* håndteres af workeren.
+# Det eget domæne tilføjes i Cloudflare-dashboardet (Workers > Domains & Routes),
+# så det ikke står i dette offentlige repo.
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*"]
+run_worker_first = true
 
 [[d1_databases]]
 binding = "DB"

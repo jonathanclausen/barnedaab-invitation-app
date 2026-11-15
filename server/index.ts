@@ -1,9 +1,22 @@
 import { handleApi } from './api'
 import type { Env } from './lib'
 
-// Worker: /api/* håndteres her, alt andet serveres fra dist/ (se wrangler.toml)
+// Worker: alle forespørgsler går først herigennem (se wrangler.toml).
+// www.<domæne> sendes videre til <domæne>, /api/* håndteres her,
+// og alt andet serveres fra dist/.
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url)
+
+    if (url.hostname.startsWith('www.')) {
+      url.hostname = url.hostname.slice(4)
+      return Response.redirect(url.toString(), 301)
+    }
+
+    if (!url.pathname.startsWith('/api/')) {
+      return env.ASSETS.fetch(request)
+    }
+
     try {
       return await handleApi(request, env)
     } catch (e) {
