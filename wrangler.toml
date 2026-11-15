@@ -13,3 +13,9 @@ binding = "DB"
 database_name = "barnedaab-invitation"
 database_id = "f1f8a80d-4d1a-4587-a18d-56119dd5ac26"
 migrations_dir = "migrations"
+
+# Forhåndsvisninger af PR-grene (`wrangler preview`) bruger en separat, tom
+# test-database, så de aldrig rører de rigtige gæstedata.
+[[previews.d1_databases]]
+binding = "DB"
+database_id = "a2cee47c-cf5d-486f-aa9e-6dc92feee572"
