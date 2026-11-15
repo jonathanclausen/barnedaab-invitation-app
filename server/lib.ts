@@ -23,6 +23,8 @@ export interface InviteRow {
   last_opened_at: string | null
   link_visits: number
   last_visit_at: string | null
+  /** Mangler hvis migration 0004 ikke er kørt endnu */
+  sent_at?: string | null
   created_at: string
 }
 
@@ -50,6 +52,7 @@ export function toInvite(row: InviteRow) {
     lastOpenedAt: row.last_opened_at,
     linkVisits: row.link_visits,
     lastVisitAt: row.last_visit_at,
+    sentAt: row.sent_at ?? null,
     createdAt: row.created_at,
   }
 }

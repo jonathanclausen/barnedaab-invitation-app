@@ -64,6 +64,7 @@ export const updateInvite = (id: string, label: string, greeting: string, guests
   call<Invite>('PUT', `admin/invites/${id}`, { label, greeting, guests })
 export const deleteInvite = (id: string) => call('DELETE', `admin/invites/${id}`)
 export const fetchHistory = (id: string) => call<HistoryEntry[]>('GET', `admin/invites/${id}/history`)
+export const markSent = (id: string, sent: boolean) => call<Invite>('POST', `admin/invites/${id}/sent`, { sent })
 export const resetOpens = (id: string) => call('POST', `admin/invites/${id}/reset`)
 
 export const fetchEvent = () =>

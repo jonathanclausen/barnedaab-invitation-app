@@ -10,6 +10,7 @@ import {
   listInvites,
   login,
   logout,
+  markSent,
   newGuestId,
   resetOpens,
   saveEvent,
@@ -85,7 +86,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
   )
 }
 
-type Filter = 'all' | 'unanswered' | 'unopened' | 'answered'
+type Filter = 'all' | 'unsent' | 'unanswered' | 'unopened' | 'answered'
 
 function Dashboard({ onLogout }: { onLogout: () => void }) {
   const { siteTitle } = useSite()
@@ -121,6 +122,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
     return {
       invites: all.length,
       opened: all.filter((i) => i.openCount > 0).length,
+      unsent: all.filter((i) => !i.sentAt).length,
       guests: guests.length,
       yes: guests.filter((a) => a === 'yes').length,
       no: guests.filter((a) => a === 'no').length,
@@ -129,6 +131,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   }, [invites])
 
   const visible = (invites ?? []).filter((i) => {
+    if (filter === 'unsent') return !i.sentAt
     if (filter === 'unanswered') return !i.respondedAt
     if (filter === 'answered') return !!i.respondedAt
     if (filter === 'unopened') return i.openCount === 0
@@ -173,6 +176,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             {(
               [
                 ['all', 'Alle'],
+                ['unsent', `Ikke sendt (${stats.unsent})`],
                 ['unopened', 'Ikke åbnet'],
                 ['unanswered', 'Ikke svaret'],
                 ['answered', 'Har svaret'],
@@ -311,6 +315,19 @@ function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitl
   const [showHistory, setShowHistory] = useState(false)
   const { copied, copy } = useCopy()
   const title = invite.label || invite.guests.map((g) => g.name).join(' og ')
+  const [savingSent, setSavingSent] = useState(false)
+
+  async function setSent(sent: boolean) {
+    setSavingSent(true)
+    try {
+      await markSent(invite.id, sent)
+      onChanged()
+    } catch {
+      window.alert('Kunne ikke gemme, om invitationen er sendt. Prøv igen.')
+    } finally {
+      setSavingSent(false)
+    }
+  }
 
   if (editing)
     return (
@@ -332,6 +349,7 @@ function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitl
             Kode <strong className="mono">{invite.code}</strong>
             {invite.respondedAt && <> · svarede {formatTimestamp(invite.respondedAt)}</>}
           </p>
+          <SentBadge invite={invite} />
         </div>
         <OpenBadge invite={invite} />
       </div>
@@ -352,7 +370,14 @@ function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitl
       {invite.note && <p className="note-echo">“{invite.note}”</p>}
 
       <div className="row row--wrap">
-        <button className="btn btn--primary btn--sm" onClick={() => copy(shareMessage(invite, siteTitle), 'msg')}>
+        <button
+          className="btn btn--primary btn--sm"
+          onClick={() => {
+            copy(shareMessage(invite, siteTitle), 'msg')
+            // Kopierer man beskeden, er det for at sende den – markér den som sendt
+            if (!invite.sentAt) setSent(true)
+          }}
+        >
           {copied === 'msg' ? 'Kopieret ✓' : 'Kopiér besked'}
         </button>
         <button className="btn btn--ghost btn--sm" onClick={() => copy(inviteUrl(invite.id), 'link')}>
@@ -366,6 +391,9 @@ function InviteCard({ invite, siteTitle, onChanged }: { invite: Invite; siteTitl
         >
           Forhåndsvis
         </a>
+        <button className="btn btn--ghost btn--sm" disabled={savingSent} onClick={() => setSent(!invite.sentAt)}>
+          {invite.sentAt ? 'Markér som ikke sendt' : 'Markér som sendt'}
+        </button>
         <button className="btn btn--ghost btn--sm" onClick={() => setShowHistory((s) => !s)}>
           {showHistory ? 'Skjul historik' : 'Historik'}
         </button>
@@ -457,6 +485,14 @@ function RsvpDetails({ entry }: { entry: HistoryEntry }) {
         note && <p className="history-note">Note: “{note}”</p>
       )}
     </>
+  )
+}
+
+function SentBadge({ invite }: { invite: Invite }) {
+  return invite.sentAt ? (
+    <p className="sent-badge is-sent">✓ Sendt {formatTimestamp(invite.sentAt)}</p>
+  ) : (
+    <p className="sent-badge">Ikke sendt endnu</p>
   )
 }
 

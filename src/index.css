@@ -300,6 +300,18 @@ textarea { resize: vertical; }
 .invite-title { font-family: var(--serif); font-size: 1.45rem; line-height: 1.15; }
 .invite-card .note-echo { margin: 0; font-size: 1.05rem; text-align: left; }
 
+.sent-badge {
+  display: inline-block;
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fbf1dc;
+  color: #8a6418;
+}
+.sent-badge.is-sent { background: var(--yes-bg); color: var(--sage-deep); }
+
 .open-badge {
   font-size: 0.78rem;
   text-align: right;
