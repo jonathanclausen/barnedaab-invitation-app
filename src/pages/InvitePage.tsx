@@ -212,7 +212,7 @@ function Invitation({
         </div>
         {(event.reception || event.receptionAddress) && (
           <div className="detail">
-            <h2>Bagefter</h2>
+            <h2>Frokost</h2>
             {event.receptionTime && <p className="detail-time">Kl. {formatTime(event.receptionTime)}</p>}
             {event.reception && <p className="detail-place">{event.reception}</p>}
             <Location address={event.receptionAddress} parking={event.receptionParking} />
