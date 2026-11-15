@@ -80,3 +80,13 @@ export function joinNames(names: string[]) {
   if (names.length <= 1) return names.join('')
   return `${names.slice(0, -1).join(', ')} og ${names[names.length - 1]}`
 }
+
+/**
+ * Vælger ental eller flertal i fritekst: "{du/I}", "{dig/jer}", "{Din/Jeres}".
+ * Første form bruges når invitationen har én person, anden form når der er flere.
+ * Tekst uden krøllede parenteser – eller med parenteser i et andet format – vises uændret.
+ */
+export function pluralize(text: string, plural: boolean) {
+  if (!text || !text.includes('{')) return text
+  return text.replace(/\{([^{}/\n]*)\/([^{}/\n]*)\}/g, (_, one: string, many: string) => (plural ? many : one))
+}

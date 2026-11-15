@@ -16,7 +16,7 @@ import {
   saveEvent,
   updateInvite,
 } from '../api'
-import { formatDate, formatTimestamp } from '../format'
+import { formatDate, formatTimestamp, pluralize } from '../format'
 import { DanishDateInput, DanishTimeInput } from '../components/DanishInputs'
 import { useSite } from '../useSite'
 import { defaultEvent, type Answer, type EventSettings, type Guest, type HistoryEntry, type Invite } from '../types'
@@ -291,9 +291,9 @@ function NewInviteForm({ onCreated }: { onCreated: () => void }) {
 }
 
 function shareMessage(invite: Invite, siteTitle: string) {
-  const greetingName = invite.label || invite.guests.map((g) => g.name).join(' og ')
+  const greetingName = pluralize(invite.label, invite.guests.length > 1) || invite.guests.map((g) => g.name).join(' og ')
   const plural = invite.guests.length > 1
-  return `Hej ${greetingName}! ${plural ? 'I' : 'Du'} er inviteret: ${siteTitle} 🤍\n\nÅbn ${plural ? 'jeres' : 'din'} invitation her og svar, om ${plural ? 'I' : 'du'} kan komme:\n${inviteUrl(invite.id)}\n\nKode: ${invite.code}`
+  return `Hej ${greetingName}! ${plural ? 'I' : 'Du'} er inviteret: ${pluralize(siteTitle, plural)} 🤍\n\nÅbn ${plural ? 'jeres' : 'din'} invitation her og svar, om ${plural ? 'I' : 'du'} kan komme:\n${inviteUrl(invite.id)}\n\nKode: ${invite.code}`
 }
 
 function useCopy() {
@@ -635,6 +635,11 @@ function EventForm() {
   return (
     <form className="card panel" onSubmit={save}>
       <h2 className="panel-title">Det står på alle invitationer</h2>
+      <p className="muted small hint">
+        Tip: Skriv <code>{'{du/I}'}</code> i teksten, så står der "du", når der er én person på invitationen, og "I",
+        når der er flere. Det virker med alle ord, f.eks. <code>{'{dig/jer}'}</code> og <code>{'{Din/Jeres}'}</code>, i
+        alle tekstfelter her og i den personlige hilsen og tiltalen.
+      </p>
       <div className="grid-2">
         <label className="field">
           <span>Sidens navn (vises før koden er tastet)</span>

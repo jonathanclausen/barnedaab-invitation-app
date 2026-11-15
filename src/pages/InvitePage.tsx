@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ApiError, openInvite, recordLinkVisit, submitRsvp } from '../api'
-import { formatDate, formatShortDate, formatTime, joinNames } from '../format'
+import { formatDate, formatShortDate, formatTime, joinNames, pluralize } from '../format'
 import type { Answer, EventSettings, GuestInvite } from '../types'
 import { Ornament } from '../components/Ornament'
 import { Envelope } from '../components/Envelope'
@@ -25,6 +25,27 @@ function storeCode(inviteId: string, code: string) {
     localStorage.setItem(storageKey(inviteId), code)
   } catch {
     // privat browsing o.l. – gæsten må bare taste koden igen næste gang
+  }
+}
+
+/** Udskifter {ental/flertal} i alle tekstfelter ud fra antallet af personer på invitationen. */
+function personalize(event: EventSettings, invite: GuestInvite): { event: EventSettings; invite: GuestInvite } {
+  const plural = invite.guests.length > 1
+  const p = (text: string) => pluralize(text, plural)
+  return {
+    event: {
+      ...event,
+      title: p(event.title),
+      intro: p(event.intro),
+      church: p(event.church),
+      churchParking: p(event.churchParking),
+      reception: p(event.reception),
+      receptionParking: p(event.receptionParking),
+      practical: p(event.practical),
+      wishlistText: p(event.wishlistText),
+      signature: p(event.signature),
+    },
+    invite: { ...invite, label: p(invite.label), greeting: p(invite.greeting) },
   }
 }
 
@@ -62,8 +83,9 @@ export default function InvitePage() {
         setManifestStart(`/i/${inviteId}?code=${encodeURIComponent(candidate.trim())}`)
         if (params.has('code')) window.history.replaceState(null, '', `/i/${inviteId}`)
       }
-      setEvent(found.event)
-      setInvite(found.invite)
+      const personal = personalize(found.event, found.invite)
+      setEvent(personal.event)
+      setInvite(personal.invite)
     } catch (e) {
       if (!silent)
         setError(
@@ -101,7 +123,7 @@ export default function InvitePage() {
         theme={theme}
         letter={
           <>
-            <p className="eyebrow">Du er inviteret</p>
+            <p className="eyebrow">{invite && invite.guests.length > 1 ? 'I er inviteret' : 'Du er inviteret'}</p>
             <p className="letter-title">{event?.title ?? site.siteTitle}</p>
             {event?.date && <p className="letter-date">{formatDate(event.date)}</p>}
           </>

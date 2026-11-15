@@ -74,8 +74,8 @@ export interface SiteInfo {
 export const defaultEvent: EventSettings = {
   siteTitle: 'Barnedåb',
   monogram: '',
-  title: 'Du er inviteret til barnedåb',
-  intro: 'Vi glæder os til at fejre dåben sammen med jer.',
+  title: '{Du/I} er inviteret til barnedåb',
+  intro: 'Vi glæder os til at fejre dåben sammen med {dig/jer}.',
   date: '',
   churchTime: '',
   church: '',
