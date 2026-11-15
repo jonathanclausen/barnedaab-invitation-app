@@ -275,6 +275,7 @@ textarea { resize: vertical; }
 .new-invite-btn { margin-bottom: 20px; }
 .panel { padding: 24px; margin-bottom: 20px; }
 .panel-title { font-family: var(--serif); font-size: 1.5rem; margin-bottom: 16px; }
+.hint { margin: -8px 0 16px; line-height: 1.5; }
 .subhead { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); font-weight: 600; margin: 8px 0 12px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 520px) { .grid-2 { grid-template-columns: 1fr; } }
