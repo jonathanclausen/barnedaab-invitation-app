@@ -90,6 +90,8 @@ code { font-size: 0.9em; background: var(--bg-deep); padding: 1px 5px; border-ra
 .center { text-align: center; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.08em; }
 .prewrap { white-space: pre-wrap; }
+/* Fritekst fra admin og gæster: vis linjeskift og tomme linjer som skrevet */
+.lead, .greeting, .note-echo, .history-note { white-space: pre-line; overflow-wrap: anywhere; }
 .error { color: var(--rose-deep); font-size: 0.92rem; margin-top: 12px; }
 
 .ornament { width: 140px; height: 28px; color: var(--sage); display: block; margin: 0 auto 16px; }
