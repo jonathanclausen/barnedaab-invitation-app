@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ApiError, openInvite, recordLinkVisit, submitRsvp } from '../api'
-import { formatDate, formatShortDate, joinNames } from '../format'
+import { formatDate, formatShortDate, formatTime, joinNames } from '../format'
 import type { Answer, EventSettings, GuestInvite } from '../types'
 import { Ornament } from '../components/Ornament'
 import { Envelope } from '../components/Envelope'
@@ -205,7 +205,7 @@ function Invitation({
       <section className="card details fade-in">
         <div className="detail">
           <h2>Dåben</h2>
-          {event.churchTime && <p className="detail-time">Kl. {event.churchTime}</p>}
+          {event.churchTime && <p className="detail-time">Kl. {formatTime(event.churchTime)}</p>}
           {event.church && <p className="detail-place">{event.church}</p>}
           <Location address={event.churchAddress} parking={event.churchParking} />
           {!event.church && !event.churchTime && <p className="muted">Detaljer følger</p>}
@@ -213,7 +213,7 @@ function Invitation({
         {(event.reception || event.receptionAddress) && (
           <div className="detail">
             <h2>Bagefter</h2>
-            {event.receptionTime && <p className="detail-time">Kl. {event.receptionTime}</p>}
+            {event.receptionTime && <p className="detail-time">Kl. {formatTime(event.receptionTime)}</p>}
             {event.reception && <p className="detail-place">{event.reception}</p>}
             <Location address={event.receptionAddress} parking={event.receptionParking} />
           </div>

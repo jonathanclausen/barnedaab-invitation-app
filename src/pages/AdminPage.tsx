@@ -15,7 +15,7 @@ import {
   saveEvent,
   updateInvite,
 } from '../api'
-import { formatTimestamp } from '../format'
+import { formatDate, formatTimestamp } from '../format'
 import { useSite } from '../useSite'
 import { defaultEvent, type Answer, type EventSettings, type Guest, type HistoryEntry, type Invite } from '../types'
 
@@ -620,10 +620,12 @@ function EventForm() {
         <label className="field">
           <span>Dato</span>
           <input type="date" value={event.date} onChange={set('date')} />
+          {event.date && <small className="muted small">{formatDate(event.date)}</small>}
         </label>
         <label className="field">
           <span>Svar senest</span>
           <input type="date" value={event.rsvpBy} onChange={set('rsvpBy')} />
+          {event.rsvpBy && <small className="muted small">{formatDate(event.rsvpBy)}</small>}
         </label>
       </div>
       <h3 className="subhead">Dåben</h3>
