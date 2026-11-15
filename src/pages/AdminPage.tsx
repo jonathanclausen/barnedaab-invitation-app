@@ -293,7 +293,7 @@ function NewInviteForm({ onCreated }: { onCreated: () => void }) {
 function shareMessage(invite: Invite, siteTitle: string) {
   const greetingName = pluralize(invite.label, invite.guests.length > 1) || invite.guests.map((g) => g.name).join(' og ')
   const plural = invite.guests.length > 1
-  return `Hej ${greetingName}! ${plural ? 'I' : 'Du'} er inviteret: ${pluralize(siteTitle, plural)} 🤍\n\nÅbn ${plural ? 'jeres' : 'din'} invitation her og svar, om ${plural ? 'I' : 'du'} kan komme:\n${inviteUrl(invite.id)}\n\nKode: ${invite.code}`
+  return `Kære ${greetingName}\n\n${plural ? 'I' : 'Du'} er inviteret: ${pluralize(siteTitle, plural)} 🤍\n\nÅbn ${plural ? 'jeres' : 'din'} invitation her og svar, om ${plural ? 'I' : 'du'} kan komme:\n${inviteUrl(invite.id)}\n\nKode: ${invite.code}`
 }
 
 function useCopy() {
