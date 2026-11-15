@@ -23,3 +23,7 @@ migrations_dir = "migrations"
 [[previews.d1_databases]]
 binding = "DB"
 database_id = "a2cee47c-cf5d-486f-aa9e-6dc92feee572"
+
+# Holdes i sync med indstillingen i Cloudflare-dashboardet.
+[observability]
+enabled = false
