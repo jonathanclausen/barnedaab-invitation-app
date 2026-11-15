@@ -16,6 +16,7 @@ import {
   updateInvite,
 } from '../api'
 import { formatDate, formatTimestamp } from '../format'
+import { DanishDateInput, DanishTimeInput } from '../components/DanishInputs'
 import { useSite } from '../useSite'
 import { defaultEvent, type Answer, type EventSettings, type Guest, type HistoryEntry, type Invite } from '../types'
 
@@ -619,12 +620,12 @@ function EventForm() {
       <div className="grid-2">
         <label className="field">
           <span>Dato</span>
-          <input type="date" value={event.date} onChange={set('date')} />
+          <DanishDateInput label="Dato" value={event.date} onChange={(v) => setEvent({ ...event, date: v })} />
           {event.date && <small className="muted small">{formatDate(event.date)}</small>}
         </label>
         <label className="field">
           <span>Svar senest</span>
-          <input type="date" value={event.rsvpBy} onChange={set('rsvpBy')} />
+          <DanishDateInput label="Svar senest" value={event.rsvpBy} onChange={(v) => setEvent({ ...event, rsvpBy: v })} />
           {event.rsvpBy && <small className="muted small">{formatDate(event.rsvpBy)}</small>}
         </label>
       </div>
@@ -636,7 +637,7 @@ function EventForm() {
         </label>
         <label className="field">
           <span>Klokken</span>
-          <input type="time" value={event.churchTime} onChange={set('churchTime')} />
+          <DanishTimeInput label="Dåben klokken" value={event.churchTime} onChange={(v) => setEvent({ ...event, churchTime: v })} />
         </label>
       </div>
       <label className="field">
@@ -655,7 +656,7 @@ function EventForm() {
         </label>
         <label className="field">
           <span>Klokken</span>
-          <input type="time" value={event.receptionTime} onChange={set('receptionTime')} />
+          <DanishTimeInput label="Bagefter klokken" value={event.receptionTime} onChange={(v) => setEvent({ ...event, receptionTime: v })} />
         </label>
       </div>
       <label className="field">
