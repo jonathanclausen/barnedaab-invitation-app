@@ -884,3 +884,15 @@ textarea { resize: vertical; }
 .history-answer--yes { color: var(--sage-deep); }
 .history-answer--no { color: var(--rose-deep); }
 .history-empty { border-top: 1px solid var(--line); padding-top: 12px; margin: 0; }
+
+/* Danske dato-/tidsfelter (24-timers ur, uafhængigt af browserens sprog) */
+.dk-input { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dk-input select {
+  font: inherit; color: var(--ink); background: #fff;
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 10px; outline: none; min-width: 0; flex: 1 1 auto;
+}
+.dk-input select:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgb(143 168 146 / 0.22); }
+.dk-prefix, .dk-sep { color: var(--muted); }
+.dk-clear { border: 0; background: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; padding: 4px 6px; }
+.dk-clear:hover { color: var(--ink); }
